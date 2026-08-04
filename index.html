@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DBCC — Command Center</title>
+  <meta name="description" content="Debono Bros Concreting — launcher for every DBCC app." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23F7941D'/><text x='16' y='22' font-family='DM Sans, sans-serif' font-size='14' font-weight='700' fill='white' text-anchor='middle'>DB</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #EDE9E2; --card: #FBF9F6;
+      --ink: #2A2620; --muted: #857C6F; --border: #DDD6CB;
+      --accent: #F7941D; --accent-dk: #B5620A;
+      --shadow: 0 1px 2px rgba(42,38,32,.05), 0 6px 20px rgba(42,38,32,.06);
+      --shadow-hi: 0 2px 4px rgba(42,38,32,.08), 0 14px 34px rgba(42,38,32,.13);
+      --radius: 16px;
+      --font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --b1: #F7941D; --b2: #E4801A; --b3: #C96A16; --b4: #A85A2C; --b5: #8A6A3A; --b6: #6E5636;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #17140F; --card: #221D17;
+        --ink: #ECE6DB; --muted: #9B9184; --border: #332C23;
+        --accent-dk: #F7A945;
+        --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+        --shadow-hi: 0 2px 4px rgba(0,0,0,.4), 0 16px 36px rgba(0,0,0,.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { background: var(--bg); color: var(--ink); font-family: var(--font);
+      -webkit-font-smoothing: antialiased; line-height: 1.5; }
+
+    .hub { max-width: 880px; margin: 0 auto; padding: clamp(28px, 6vw, 64px) 22px 48px; }
+
+    .hub-head { display: flex; align-items: center; gap: 16px; margin-bottom: clamp(24px, 4vw, 40px); }
+    .mark { flex: none; width: 52px; height: 52px; border-radius: 13px; background: var(--accent);
+      color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 1.15rem;
+      letter-spacing: .5px; box-shadow: var(--shadow); }
+    .eyebrow { margin: 0; font-size: .72rem; font-weight: 600; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent-dk); }
+    h1 { margin: 2px 0 3px; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700;
+      letter-spacing: -.02em; text-wrap: balance; }
+    .tag { margin: 0; color: var(--muted); font-size: .95rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 14px; }
+
+    .tile { display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+      gap: 14px; padding: 16px 18px; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); text-decoration: none; color: inherit;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+    .tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-hi); border-color: var(--accent); }
+    .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    .badge { flex: none; width: 44px; height: 44px; border-radius: 11px; color: #fff;
+      display: grid; place-items: center; font-weight: 700; font-size: .92rem; letter-spacing: .3px; }
+    .b1 { background: var(--b1); } .b2 { background: var(--b2); } .b3 { background: var(--b3); }
+    .b4 { background: var(--b4); } .b5 { background: var(--b5); } .b6 { background: var(--b6); }
+
+    .tile-body { min-width: 0; }
+    .tile-name { display: block; font-weight: 600; font-size: 1rem; }
+    .tile-desc { display: block; color: var(--muted); font-size: .84rem; margin-top: 1px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .open { flex: none; font-size: .8rem; font-weight: 600; color: var(--accent-dk);
+      opacity: 0; transform: translateX(-4px); transition: opacity .16s ease, transform .16s ease; }
+    .tile:hover .open, .tile:focus-visible .open { opacity: 1; transform: translateX(0); }
+
+    .hub-foot { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--border);
+      color: var(--muted); font-size: .8rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .lock { color: var(--accent-dk); }
+
+    @media (max-width: 560px) {
+      .hub-head { align-items: flex-start; }
+      .open { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tile, .open { transition: none; }
+      .tile:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="hub">
+    <header class="hub-head">
+      <div class="mark" aria-hidden="true">DB</div>
+      <div>
+        <p class="eyebrow">Debono Bros Concreting</p>
+        <h1>Command Center</h1>
+        <p class="tag">Pick a tool — each opens in its own secure sign-in.</p>
+      </div>
+    </header>
+
+    <nav class="grid" aria-label="DBCC applications">
+      <a class="tile" href="https://master-ops.vercel.app" target="_blank" rel="noopener">
+        <span class="badge b1" aria-hidden="true">MO</span>
+        <span class="tile-body">
+          <span class="tile-name">Master-OPS</span>
+          <span class="tile-desc">Cost management &amp; SOPA progress claims</span>
+        </span>
+        <span class="open" aria-hidden="true">Open &#8599;</span>
+      </a>
+
+      <a class="tile" href="https://dbcc-programing-tool.vercel.app" target="_blank" rel="noopener">
+        <span class="badge b2" aria-hidden="true">PR</span>
+        <span class="tile-body">
+          <span class="tile-name">Programing Tool</span>
+          <span class="tile-desc">WBS scheduling &amp; Gantt programme</span>
+        </span>
+        <span class="open" aria-hidden="true">Open &#8599;</span>
+      </a>
+
+      <a class="tile" href="https://dbcc-defect-tool.vercel.app" target="_blank" rel="noopener">
+        <span class="badge b3" aria-hidden="true">DF</span>
+        <span class="tile-body">
+          <span class="tile-name">Defect Management</span>
+          <span class="tile-desc">Defect register &amp; builder evidence</span>
+        </span>
+        <span class="open" aria-hidden="true">Open &#8599;</span>
+      </a>
+
+      <a class="tile" href="https://dbcc-po-inventory.vercel.app" target="_blank" rel="noopener">
+        <span class="badge b4" aria-hidden="true">PO</span>
+        <span class="tile-body">
+          <span class="tile-name">PO &amp; Inventory</span>
+          <span class="tile-desc">Purchase orders &amp; stock control</span>
+        </span>
+        <span class="open" aria-hidden="true">Open &#8599;</span>
+      </a>
+
+      <a class="tile" href="https://selvadbcc.github.io/reo-schedule/" target="_blank" rel="noopener">
+        <span class="badge b5" aria-hidden="true">RE</span>
+        <span class="tile-body">
+          <span class="tile-name">REO Schedule</span>
+          <span class="tile-desc">Reinforcement scheduling</span>
+        </span>
+        <span class="open" aria-hidden="true">Open &#8599;</span>
+      </a>
+
+      <a class="tile" href="https://dbcc-attendance.vercel.app" target="_blank" rel="noopener">
+        <span class="badge b6" aria-hidden="true">SA</span>
+        <span class="tile-body">
+          <span class="tile-name">Site Attendance</span>
+          <span class="tile-desc">Crew check-in — admin console</span>
+        </span>
+        <span class="open" aria-hidden="true">Open &#8599;</span>
+      </a>
+    </nav>
+
+    <footer class="hub-foot">
+      <span class="lock" aria-hidden="true">&#128274;</span>
+      <span>Every tool signs in separately — this page just points the way.</span>
+    </footer>
+  </main>
+</body>
+</html>
